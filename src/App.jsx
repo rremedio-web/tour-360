@@ -1,5 +1,7 @@
+import { rooms } from "./data/rooms"
+
 function App() {
-  return <h1>Tour 360</h1>
+  return <h1>{rooms[0].name}</h1>
 }
 
 export default App
