@@ -1,5 +1,6 @@
 import { rooms } from "./data/rooms"
 import RoomNav from "./components/RoomNav"
+import HotspotList from "./components/HotspotList"
 import { useState } from "react"
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
       <h1>{currentRoom.name}</h1>
       <img src={currentRoom.image} alt={currentRoom.name} />
       <RoomNav rooms={rooms} onChangeRoom={changeRoom} />
+      <HotspotList hotspots={currentRoom.hotspots} onChangeRoom={changeRoom} />
     </>)
 }
 
