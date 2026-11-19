@@ -1,12 +1,19 @@
 import { rooms } from "./data/rooms"
 import RoomNav from "./components/RoomNav"
+import { useState } from "react"
 
 function App() {
+  const [roomId, setRoomId] = useState("lounge")
+
+  function changeRoom(id) {
+    setRoomId(id)
+  }
+  const currentRoom = rooms.find((room) => room.id === roomId)
   return (
     <>
-      <h1>{rooms[0].name}</h1>
-      <img src={rooms[0].image} alt={rooms[0].name} />
-      <RoomNav rooms={rooms} />
+      <h1>{currentRoom.name}</h1>
+      <img src={currentRoom.image} alt={currentRoom.name} />
+      <RoomNav rooms={rooms} onChangeRoom={changeRoom} />
     </>)
 }
 
