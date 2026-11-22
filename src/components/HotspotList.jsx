@@ -2,7 +2,7 @@ const HotspotList = ({ hotspots, onChangeHotspot }) => {
     return (
         <ul className="hotspot-nav">
             {hotspots.map((hotspot) => (
-                <li key={hotspot.id}><button onClick={() => onChangeHotspot(hotspot.id, hotspot.targetRoomId)}>{hotspot.title}</button></li>
+                <li key={hotspot.id}><button onClick={(event) => onChangeHotspot(hotspot.id, hotspot.targetRoomId, event)}>{hotspot.title}</button></li>
             ))}
         </ul>
     );
