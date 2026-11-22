@@ -55,7 +55,7 @@ button {
 #root {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto 1fr auto auto auto;
   min-height: 100dvh;
 }
 
@@ -139,6 +139,65 @@ button {
   background: #353c45;
 }
 
+/* Details of the open hotspot: the bottom of the panel, only while one is open */
+#root:has(.hotspot-panel) .hotspot-nav {
+  padding-bottom: 16px;
+}
+
+.hotspot-panel {
+  grid-row: 5;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+  padding: 0 16px 24px;
+  background: var(--surface-sheet);
+}
+
+/* The divider above the details */
+.hotspot-panel::before {
+  content: '';
+  grid-column: 1 / -1;
+  margin-bottom: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.hotspot-panel > :is(h2, h3, h4) {
+  grid-column: 1;
+  grid-row: 2;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+}
+
+.hotspot-panel > p {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  margin: 12px 0 0;
+  color: var(--text-soft);
+  font-size: 15px;
+  line-height: 24px;
+}
+
+/* Close button: 44px circle */
+.hotspot-panel > button {
+  grid-column: 2;
+  grid-row: 2;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--outline);
+  border-radius: 50%;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.hotspot-panel > button:hover {
+  border-color: var(--text);
+}
+
 /* 768px and up: header top left, panel as a 360px card top right */
 @media (min-width: 768px) {
   :root {
@@ -147,7 +206,7 @@ button {
 
   #root {
     grid-template-columns: 1fr 360px;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto auto;
     align-content: start;
     column-gap: var(--edge);
     padding: var(--edge);
@@ -155,7 +214,7 @@ button {
 
   #root > h1 {
     grid-column: 1;
-    grid-row: 1 / span 2;
+    grid-row: 1 / span 3;
     align-self: start;
     margin: 0;
     padding: 14px 18px 16px;
@@ -165,7 +224,8 @@ button {
   }
 
   .room-nav,
-  .hotspot-nav {
+  .hotspot-nav,
+  .hotspot-panel {
     grid-column: 2;
     background: var(--surface);
   }
@@ -181,5 +241,20 @@ button {
     align-self: start;
     padding: 10px 20px 20px;
     border-radius: 0 0 16px 16px;
+  }
+
+  #root:has(.hotspot-panel) .hotspot-nav {
+    padding-bottom: 20px;
+    border-radius: 0;
+  }
+
+  .hotspot-panel {
+    grid-row: 3;
+    padding: 0 20px 20px;
+    border-radius: 0 0 16px 16px;
+  }
+
+  .hotspot-panel::before {
+    margin-bottom: 20px;
   }
 }
