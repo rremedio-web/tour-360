@@ -10,9 +10,14 @@ function App() {
 
   function changeRoom(id) {
     setRoomId(id)
+    setHotspotId(null)
   }
-  function openHotspot(id) {
-    setHotspotId(id)
+  function openHotspot(id, targetRoomId) {
+    if (currentRoom.hotspots.find((hotspot) => hotspot.id === id).type === "info") {
+      setHotspotId(id)
+    } else {
+      changeRoom(targetRoomId)
+    }
   }
   function closeHotspot() {
     setHotspotId(null)
