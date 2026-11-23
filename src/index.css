@@ -72,11 +72,19 @@ button {
 }
 
 /* The 3D view: fills the screen behind the UI. It needs a real size,
-   because the camera's aspect and the canvas size are read from it. */
+   because the camera's aspect and the canvas size are read from it.
+   z-index 0, not -1: a negative z-index sits behind the page's own boxes,
+   which would catch the drag before the canvas does. */
 .panorama-viewer {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
+}
+
+/* The UI sits above the 3D view (the flat image stays below it) */
+#root > :not(img, .panorama-viewer) {
+  position: relative;
+  z-index: 1;
 }
 
 /* A canvas is inline by default, which leaves a small gap under it */

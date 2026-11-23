@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Scene, Color, PerspectiveCamera, WebGLRenderer, SphereGeometry, MeshBasicMaterial, SRGBColorSpace, Mesh, TextureLoader } from "three"
-
+import { OrbitControls } from "three/addons/controls/OrbitControls.js"
 
 const PanoramaViewer = () => {
     const containerRef = useRef(null)
@@ -21,11 +21,15 @@ const PanoramaViewer = () => {
         scene.add(mesh);
         renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
         containerRef.current.appendChild(renderer.domElement);
+        camera.position.z = 0.01
+        const controls = new OrbitControls(camera, renderer.domElement)
+        controls.enableZoom = false
+        controls.enablePan = false
+        controls.rotateSpeed = -0.25
         let frameId
         function tick() {
-            renderer.render(scene, camera)  // do one frame's work
+            renderer.render(scene, camera)
             frameId = requestAnimationFrame(tick)
-            camera.rotation.y += 0.002                // book the next frame
         }
         tick()
         return () => {
@@ -34,7 +38,8 @@ const PanoramaViewer = () => {
             geometry.dispose()
             material.dispose()
             texture.dispose()
-            cancelAnimationFrame(frameId)                            // stop it
+            controls.dispose()
+            cancelAnimationFrame(frameId)
 
         };
     }, []);
