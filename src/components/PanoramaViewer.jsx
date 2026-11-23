@@ -14,7 +14,6 @@ const PanoramaViewer = () => {
             containerRef.current.clientWidth / containerRef.current.clientHeight, 0.1, 1000);
         const renderer = new WebGLRenderer();
         const texture = new TextureLoader().load("/panoramas/lounge.jpg", () => {
-            renderer.render(scene, camera)
         })
         texture.colorSpace = SRGBColorSpace
         const material = new MeshBasicMaterial({ map: texture })
@@ -22,12 +21,21 @@ const PanoramaViewer = () => {
         scene.add(mesh);
         renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
         containerRef.current.appendChild(renderer.domElement);
+        let frameId
+        function tick() {
+            renderer.render(scene, camera)  // do one frame's work
+            frameId = requestAnimationFrame(tick)
+            camera.rotation.y += 0.002                // book the next frame
+        }
+        tick()
         return () => {
             renderer.domElement.remove()
             renderer.dispose()
             geometry.dispose()
             material.dispose()
             texture.dispose()
+            cancelAnimationFrame(frameId)                            // stop it
+
         };
     }, []);
 
