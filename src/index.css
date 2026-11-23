@@ -71,6 +71,19 @@ button {
   object-position: 65% 55%; /* garden doors in the lounge */
 }
 
+/* The 3D view: fills the screen behind the UI. It needs a real size,
+   because the camera's aspect and the canvas size are read from it. */
+.panorama-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+/* A canvas is inline by default, which leaves a small gap under it */
+.panorama-viewer canvas {
+  display: block;
+}
+
 /* Header: the room name */
 #root > h1 {
   grid-row: 1;
