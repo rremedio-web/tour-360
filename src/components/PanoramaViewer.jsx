@@ -23,7 +23,11 @@ const PanoramaViewer = () => {
         renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
         containerRef.current.appendChild(renderer.domElement);
         return () => {
-            console.log("stop")
+            renderer.domElement.remove()
+            renderer.dispose()
+            geometry.dispose()
+            material.dispose()
+            texture.dispose()
         };
     }, []);
 
