@@ -2,6 +2,7 @@ import { rooms } from "./data/rooms"
 import RoomNav from "./components/RoomNav"
 import HotspotList from "./components/HotspotList"
 import HotspotPanel from "./components/HotspotPanel"
+import PanoramaViewer from "./components/PanoramaViewer"
 import { useState, useRef } from "react"
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
       changeRoom(targetRoomId)
     }
   }
+
   function closeHotspot() {
     setHotspotId(null)
     focusRef.current?.focus()
@@ -35,6 +37,7 @@ function App() {
       <RoomNav rooms={rooms} onChangeRoom={changeRoom} />
       <HotspotList hotspots={currentRoom.hotspots} onChangeHotspot={openHotspot} />
       {hotspotId && <HotspotPanel currentHotspot={currentHotspot} onClose={closeHotspot} />}
+      <PanoramaViewer />
     </>)
 }
 
