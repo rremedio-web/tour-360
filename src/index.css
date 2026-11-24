@@ -59,18 +59,6 @@ button {
   min-height: 100dvh;
 }
 
-/* Stand-in for the 3D view until milestone 3: the panorama fills the screen */
-#root > img {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  object-fit: cover;
-  object-position: 65% 55%; /* garden doors in the lounge */
-}
-
 /* The 3D view: fills the screen behind the UI. It needs a real size,
    because the camera's aspect and the canvas size are read from it.
    z-index 0, not -1: a negative z-index sits behind the page's own boxes,
@@ -81,8 +69,8 @@ button {
   z-index: 0;
 }
 
-/* The UI sits above the 3D view (the flat image stays below it) */
-#root > :not(img, .panorama-viewer) {
+/* The UI sits above the 3D view */
+#root > :not(.panorama-viewer) {
   position: relative;
   z-index: 1;
 }
