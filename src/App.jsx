@@ -33,11 +33,10 @@ function App() {
   return (
     <>
       <h1>{currentRoom.name}</h1>
-      <img src={currentRoom.image} alt={currentRoom.name} />
       <RoomNav rooms={rooms} onChangeRoom={changeRoom} />
       <HotspotList hotspots={currentRoom.hotspots} onChangeHotspot={openHotspot} />
       {hotspotId && <HotspotPanel currentHotspot={currentHotspot} onClose={closeHotspot} />}
-      <PanoramaViewer />
+      <PanoramaViewer image={currentRoom.image} />
     </>)
 }
 

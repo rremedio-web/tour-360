@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Scene, Color, PerspectiveCamera, WebGLRenderer, SphereGeometry, MeshBasicMaterial, SRGBColorSpace, Mesh, TextureLoader } from "three"
 import { OrbitControls } from "three/addons/controls/OrbitControls.js"
 
-const PanoramaViewer = () => {
+const PanoramaViewer = ({ image }) => {
     const containerRef = useRef(null)
     useEffect(() => {
         const scene = new Scene();
@@ -13,7 +13,7 @@ const PanoramaViewer = () => {
         const camera = new PerspectiveCamera(75,
             containerRef.current.clientWidth / containerRef.current.clientHeight, 0.1, 1000);
         const renderer = new WebGLRenderer();
-        const texture = new TextureLoader().load("/panoramas/lounge.jpg", () => {
+        const texture = new TextureLoader().load(image, () => {
         })
         texture.colorSpace = SRGBColorSpace
         const material = new MeshBasicMaterial({ map: texture })
@@ -51,7 +51,7 @@ const PanoramaViewer = () => {
             cancelAnimationFrame(frameId)
             observer.disconnect()
         };
-    }, []);
+    }, [image]);
 
     return (
         <div className="panorama-viewer" ref={containerRef}>
