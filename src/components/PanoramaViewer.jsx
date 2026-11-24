@@ -20,6 +20,7 @@ const PanoramaViewer = () => {
         const mesh = new Mesh(geometry, material);
         scene.add(mesh);
         renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
         containerRef.current.appendChild(renderer.domElement);
         camera.position.z = 0.01
         const controls = new OrbitControls(camera, renderer.domElement)
@@ -32,6 +33,14 @@ const PanoramaViewer = () => {
             frameId = requestAnimationFrame(tick)
         }
         tick()
+        const observer = new ResizeObserver(() => {
+            camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight
+            camera.updateProjectionMatrix()
+            renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight)
+
+        })
+
+        observer.observe(containerRef.current)
         return () => {
             renderer.domElement.remove()
             renderer.dispose()
@@ -40,7 +49,7 @@ const PanoramaViewer = () => {
             texture.dispose()
             controls.dispose()
             cancelAnimationFrame(frameId)
-
+            observer.disconnect()
         };
     }, []);
 
