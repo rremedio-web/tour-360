@@ -18,7 +18,7 @@ function pointToYawPitch(point) {
     return { yaw, pitch }
 }
 
-const PanoramaViewer = ({ image }) => {
+const PanoramaViewer = ({ image, hotspots }) => {
 
     const containerRef = useRef(null)
     useEffect(() => {
@@ -67,13 +67,20 @@ const PanoramaViewer = ({ image }) => {
         controls.rotateSpeed = -0.25
 
 
-        const markerTexture = new TextureLoader().load("/markers/info.png")
-        markerTexture.colorSpace = SRGBColorSpace
-        const markerMaterial = new SpriteMaterial({ map: markerTexture })
-        const marker = new Sprite(markerMaterial)
-        marker.position.copy(yawPitchToPoint(0, 0, 100))
-        marker.scale.set(5, 5, 1)
-        scene.add(marker)
+        const infoTexture = new TextureLoader().load("/markers/info.png")
+        infoTexture.colorSpace = SRGBColorSpace
+        const linkTexture = new TextureLoader().load("/markers/link.png")
+        linkTexture.colorSpace = SRGBColorSpace
+        const infoMaterial = new SpriteMaterial({ map: infoTexture })
+        const linkMaterial = new SpriteMaterial({ map: linkTexture })
+
+        hotspots.forEach((hotspot) => {
+            const marker = new Sprite(hotspot.type === "info" ? infoMaterial : linkMaterial)
+            marker.position.copy(yawPitchToPoint(hotspot.yaw, hotspot.pitch))
+            marker.scale.set(20, 20, 1)
+            scene.add(marker)
+        })
+
 
 
         let frameId
@@ -97,14 +104,16 @@ const PanoramaViewer = ({ image }) => {
             material.dispose()
             texture.dispose()
             controls.dispose()
-            markerTexture.dispose()
-            markerMaterial.dispose()
+            infoTexture.dispose()
+            linkTexture.dispose()
+            linkMaterial.dispose()
+            infoMaterial.dispose()
             cancelAnimationFrame(frameId)
             observer.disconnect()
             renderer.domElement.removeEventListener("click", logDirection)
 
         };
-    }, [image]);
+    }, [image, hotspots]);
 
     return (
         <div className="panorama-viewer" ref={containerRef}>
