@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Scene, Color, PerspectiveCamera, WebGLRenderer, SphereGeometry, MeshBasicMaterial, SRGBColorSpace, Mesh, TextureLoader, SpriteMaterial, Sprite } from "three"
+import { Scene, Color, PerspectiveCamera, WebGLRenderer, SphereGeometry, MeshBasicMaterial, SRGBColorSpace, Mesh, TextureLoader, SpriteMaterial, Sprite, Raycaster, Vector2 } from "three"
 import { OrbitControls } from "three/addons/controls/OrbitControls.js"
 import { MathUtils, Vector3 } from "three"
 function yawPitchToPoint(yaw, pitch, radius = 400) {
@@ -12,10 +12,18 @@ function yawPitchToPoint(yaw, pitch, radius = 400) {
     )
 }
 
+function pointToYawPitch(point) {
+    const pitch = MathUtils.radToDeg(Math.asin(point.y / point.length()))
+    const yaw = MathUtils.radToDeg(Math.atan2(point.x, -point.z))
+    return { yaw, pitch }
+}
+
 const PanoramaViewer = ({ image }) => {
 
     const containerRef = useRef(null)
     useEffect(() => {
+
+
         const scene = new Scene();
         scene.background = new Color("#1a2b3c");
         const geometry = new SphereGeometry(500, 60, 40);
@@ -34,10 +42,31 @@ const PanoramaViewer = ({ image }) => {
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
         containerRef.current.appendChild(renderer.domElement);
         camera.position.z = 0.01
+
+
+        const raycaster = new Raycaster()
+
+        function logDirection(event) {
+            const box = renderer.domElement.getBoundingClientRect()
+            const pointer = new Vector2(
+                ((event.clientX - box.left) / box.width) * 2 - 1,
+                -((event.clientY - box.top) / box.height) * 2 + 1,
+            )
+            raycaster.setFromCamera(pointer, camera)
+            const hit = raycaster.intersectObject(mesh)[0]
+            if (hit) {
+                const { yaw, pitch } = pointToYawPitch(hit.point)
+                console.log(`yaw: ${Math.round(yaw)}, pitch: ${Math.round(pitch)}`)
+            }
+        }
+
+        renderer.domElement.addEventListener("click", logDirection)
         const controls = new OrbitControls(camera, renderer.domElement)
         controls.enableZoom = false
         controls.enablePan = false
         controls.rotateSpeed = -0.25
+
+
         const markerTexture = new TextureLoader().load("/markers/info.png")
         markerTexture.colorSpace = SRGBColorSpace
         const markerMaterial = new SpriteMaterial({ map: markerTexture })
@@ -45,6 +74,8 @@ const PanoramaViewer = ({ image }) => {
         marker.position.copy(yawPitchToPoint(0, 0, 100))
         marker.scale.set(5, 5, 1)
         scene.add(marker)
+
+
         let frameId
         function tick() {
             renderer.render(scene, camera)
@@ -70,6 +101,8 @@ const PanoramaViewer = ({ image }) => {
             markerMaterial.dispose()
             cancelAnimationFrame(frameId)
             observer.disconnect()
+            renderer.domElement.removeEventListener("click", logDirection)
+
         };
     }, [image]);
 
