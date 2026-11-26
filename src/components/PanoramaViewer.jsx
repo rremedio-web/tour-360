@@ -12,13 +12,7 @@ function yawPitchToPoint(yaw, pitch, radius = 400) {
     )
 }
 
-function pointToYawPitch(point) {
-    const pitch = MathUtils.radToDeg(Math.asin(point.y / point.length()))
-    const yaw = MathUtils.radToDeg(Math.atan2(point.x, -point.z))
-    return { yaw, pitch }
-}
-
-const PanoramaViewer = ({ image, hotspots }) => {
+const PanoramaViewer = ({ image, hotspots, onHotspotClick }) => {
 
     const containerRef = useRef(null)
     useEffect(() => {
@@ -46,21 +40,33 @@ const PanoramaViewer = ({ image, hotspots }) => {
 
         const raycaster = new Raycaster()
 
-        function logDirection(event) {
+        let downX, downY
+        renderer.domElement.addEventListener("pointerdown", rememberDown)
+
+        function rememberDown(event) {
+            downX = event.clientX
+            downY = event.clientY
+        }
+
+        function handleMarkerClick(event) {
+            if (Math.hypot(event.clientX - downX, event.clientY - downY) > 6) return
             const box = renderer.domElement.getBoundingClientRect()
             const pointer = new Vector2(
                 ((event.clientX - box.left) / box.width) * 2 - 1,
                 -((event.clientY - box.top) / box.height) * 2 + 1,
             )
             raycaster.setFromCamera(pointer, camera)
-            const hit = raycaster.intersectObject(mesh)[0]
+            const hit = raycaster.intersectObjects(markers)[0]
             if (hit) {
-                const { yaw, pitch } = pointToYawPitch(hit.point)
-                console.log(`yaw: ${Math.round(yaw)}, pitch: ${Math.round(pitch)}`)
+                const hotspot = hit.object.userData.hotspot
+                onHotspotClick(hotspot.id, hotspot.targetRoomId, event)
             }
         }
 
-        renderer.domElement.addEventListener("click", logDirection)
+        renderer.domElement.addEventListener("click", handleMarkerClick)
+
+
+
         const controls = new OrbitControls(camera, renderer.domElement)
         controls.enableZoom = false
         controls.enablePan = false
@@ -73,9 +79,11 @@ const PanoramaViewer = ({ image, hotspots }) => {
         linkTexture.colorSpace = SRGBColorSpace
         const infoMaterial = new SpriteMaterial({ map: infoTexture })
         const linkMaterial = new SpriteMaterial({ map: linkTexture })
-
+        const markers = []
         hotspots.forEach((hotspot) => {
             const marker = new Sprite(hotspot.type === "info" ? infoMaterial : linkMaterial)
+            marker.userData.hotspot = hotspot
+            markers.push(marker)
             marker.position.copy(yawPitchToPoint(hotspot.yaw, hotspot.pitch))
             marker.scale.set(20, 20, 1)
             scene.add(marker)
@@ -110,7 +118,8 @@ const PanoramaViewer = ({ image, hotspots }) => {
             infoMaterial.dispose()
             cancelAnimationFrame(frameId)
             observer.disconnect()
-            renderer.domElement.removeEventListener("click", logDirection)
+            renderer.domElement.removeEventListener("click", handleMarkerClick)
+            renderer.domElement.removeEventListener("pointerdown", rememberDown)
 
         };
     }, [image, hotspots]);
