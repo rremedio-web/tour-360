@@ -40,7 +40,7 @@ function App() {
       <RoomNav rooms={rooms} onChangeRoom={changeRoom} />
       <HotspotList hotspots={currentRoom.hotspots} onChangeHotspot={openHotspot} />
       {hotspotId && <HotspotPanel currentHotspot={currentHotspot} onClose={closeHotspot} />}
-      <PanoramaViewer image={currentRoom.image} hotspots={currentRoom.hotspots} onHotspotClick={openHotspot} />
+      <PanoramaViewer image={currentRoom.image} hotspots={currentRoom.hotspots} onHotspotClick={openHotspot} openHotspotId={hotspotId} />
     </>)
 }
 

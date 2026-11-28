@@ -12,7 +12,7 @@ function yawPitchToPoint(yaw, pitch, radius = 400) {
     )
 }
 
-const PanoramaViewer = ({ image, hotspots, onHotspotClick }) => {
+const PanoramaViewer = ({ image, hotspots, onHotspotClick, openHotspotId }) => {
 
     const containerRef = useRef(null)
     const sceneRef = useRef(null)
@@ -74,8 +74,6 @@ const PanoramaViewer = ({ image, hotspots, onHotspotClick }) => {
 
     useEffect(() => {
         const scene = sceneRef.current
-        const camera = cameraRef.current
-        const renderer = rendererRef.current
 
         const geometry = new SphereGeometry(500, 60, 40);
         geometry.scale(-1, 1, 1)
@@ -83,19 +81,40 @@ const PanoramaViewer = ({ image, hotspots, onHotspotClick }) => {
         const texture = new TextureLoader().load(image, () => {
         })
         texture.colorSpace = SRGBColorSpace
+
         const material = new MeshBasicMaterial({ map: texture })
         const mesh = new Mesh(geometry, material);
         scene.add(mesh);
+
+
+        return () => {
+            geometry.dispose()
+            texture.dispose()
+            material.dispose()
+            scene.remove(mesh)
+
+        };
+    }, [image]);
+
+
+    useEffect(() => {
+        const scene = sceneRef.current
+        const camera = cameraRef.current
+        const renderer = rendererRef.current
 
         const infoTexture = new TextureLoader().load("/markers/info.png")
         infoTexture.colorSpace = SRGBColorSpace
         const linkTexture = new TextureLoader().load("/markers/link.png")
         linkTexture.colorSpace = SRGBColorSpace
+        const infoOpenTexture = new TextureLoader().load("/markers/info-open.png")
+        infoOpenTexture.colorSpace = SRGBColorSpace
+        const infoOpenMaterial = new SpriteMaterial({ map: infoOpenTexture })
         const infoMaterial = new SpriteMaterial({ map: infoTexture })
         const linkMaterial = new SpriteMaterial({ map: linkTexture })
+
         const markers = []
         hotspots.forEach((hotspot) => {
-            const marker = new Sprite(hotspot.type === "info" ? infoMaterial : linkMaterial)
+            const marker = new Sprite(hotspot.type === "info" ? openHotspotId === hotspot.id ? infoOpenMaterial : infoMaterial : linkMaterial)
             marker.userData.hotspot = hotspot
             markers.push(marker)
             marker.position.copy(yawPitchToPoint(hotspot.yaw, hotspot.pitch))
@@ -130,20 +149,21 @@ const PanoramaViewer = ({ image, hotspots, onHotspotClick }) => {
         renderer.domElement.addEventListener("click", handleMarkerClick)
 
         return () => {
-            geometry.dispose()
-            material.dispose()
-            texture.dispose()
+
             infoTexture.dispose()
             linkTexture.dispose()
             linkMaterial.dispose()
             infoMaterial.dispose()
+            infoOpenTexture.dispose()
+            infoOpenMaterial.dispose()
             renderer.domElement.removeEventListener("click", handleMarkerClick)
             renderer.domElement.removeEventListener("pointerdown", rememberDown)
-            scene.remove(mesh, ...markers)
+            scene.remove(...markers)
+
         }
 
 
-    }, [image, hotspots, onHotspotClick]);
+    }, [hotspots, onHotspotClick, openHotspotId]);
 
     return (
         <div className="panorama-viewer" ref={containerRef}>
