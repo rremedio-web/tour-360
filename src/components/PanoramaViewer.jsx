@@ -17,7 +17,6 @@ const PanoramaViewer = ({ image, hotspots, onHotspotClick }) => {
     const containerRef = useRef(null)
     useEffect(() => {
 
-
         const scene = new Scene();
         scene.background = new Color("#1a2b3c");
         const geometry = new SphereGeometry(500, 60, 40);
@@ -122,7 +121,7 @@ const PanoramaViewer = ({ image, hotspots, onHotspotClick }) => {
             renderer.domElement.removeEventListener("pointerdown", rememberDown)
 
         };
-    }, [image, hotspots]);
+    }, [image, hotspots, onHotspotClick]);
 
     return (
         <div className="panorama-viewer" ref={containerRef}>
